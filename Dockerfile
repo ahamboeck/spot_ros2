@@ -2,7 +2,7 @@
 FROM ubuntu:22.04
 
 #RMW ZENOH experimental flag
-ARG EXPERIMENTAL_ZENOH_RMW=FALSE
+ARG EXPERIMENTAL_ZENOH_RMW=TRUE
 
 # Set noninteractive mode for APT
 ENV DEBIAN_FRONTEND=noninteractive
@@ -45,6 +45,13 @@ RUN apt-get update -q && \
     $(if [ "$EXPERIMENTAL_ZENOH_RMW" = "TRUE" ]; then echo "ros-humble-rmw-zenoh-cpp"; fi) \
     && rm -rf /var/lib/apt/lists/*
 
+# Install RQT and other visualization tools
+RUN apt-get update && \
+    apt-get install -y \
+    ros-humble-rqt* \
+    ros-humble-rviz2 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set up workspace
 WORKDIR /ros_ws/src
 
@@ -62,3 +69,7 @@ RUN ARCH=$(dpkg --print-architecture) && echo "Building driver with $ARCH" && /r
 WORKDIR /ros_ws/
 RUN . /opt/ros/humble/setup.sh && \
     colcon build --symlink-install
+
+# Add source commands to .bashrc
+RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc && \
+    echo "source /ros_ws/install/setup.bash" >> /root/.bashrc
