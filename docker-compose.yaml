@@ -2,15 +2,11 @@ services:
   spot-ros2-driver:
     image: spot_ros2:latest
     volumes:
-      - ../config/robot_config.yaml:/ros_ws/src/robot.yaml
+      - /home/ahamboeck/local_git/dev/ros2/config/robot_config.yaml:/ros_ws/src/robot.yaml
       - /tmp/.X11-unix:/tmp/.X11-unix  # X11 socket for GUI
     environment:
       - SPOT_NAME=${SPOT_NAME:-zazu}
       - DISPLAY=${DISPLAY}  # For GUI applications
       - QT_X11_NO_MITSHM=1  # Fix for some Qt-based GUI applications
     network_mode: host  # Use host network for easier Spot connectivity
-    command: >
-      bash -c "
-        source ~/.bashrc &&
-        ros2 launch spot_driver spot_driver.launch.py config_file:=/ros_ws/src/robot.yaml spot_name:=$${SPOT_NAME} launch_rviz:=False
-      "
+    command: tail -f /dev/null
